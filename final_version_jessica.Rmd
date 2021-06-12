@@ -1,0 +1,59 @@
+---
+(Hi Dr. Schiffer, analysis of the results is all the way down, you will need to scroll down a little bit. Thanks!)
+---
+Project 2 - Jessica Wang
+
+Scientific question:
+
+Does a person's age correlate with his/her risk of mortality from Sars-CoV-2?
+----------
+Background:
+
+Sars-CoV-2, a RNA virus from the large family of the Coronavirus, has quickly become a major health public concern since its epidemic outbreak in December 2019 (Wang 2020). Different intrinsic factors have been identified to better understand the high mortality rate from Sars-CoV-2: among them, age was found to potentially be a risk factor for Sars-CoV-2 fatality (Wolff 2020). 
+Number of total deaths by age groups in Canada, USA and Australia were found on each country's government website (health-infobase.canada.ca, covid.cdc.gov and https://www.health.gov.au respectively). 
+---------
+Hypothesis:
+
+If a person's age affects his/her risk of mortality from Sars-CoV-2, then COVID-19 mortality rate within US, Canada and France will be higher among their elder population. 
+---------
+Description of work done to answer scientific question, and disprove/prove scientific hypothesis:
+
+Number of deaths for each country was first normalized into percentage. One-way Anova test was then performed to determine if there were any statistically significant differences between the mean of death percentage between each age group. My categorical independent variable was age and my quantitative dependent variable was the percentage of death from Sars-CoV-2 in Canada, USA and France for each age. If the obtained P-value is no significant, this mean that age may not be a factor that influence on the risk to die from Sars-CoV-2. However, if the P-value is significant, this means that age may be a factor that influence on the risk to die from Sars-CoV-2. In that case, I will look at the age's range that have high percentage of mortality in Canada, USA and Australia. To visualize my hypothesis answer, I will then use a plot graph that will display the mean and standard deviation of each age that are being compared.
+----------
+Downlanding package:
+Below are the codes for the packages that need to be downloaded first and then run:
+```{r}
+install.packages("ggplot2")
+```
+Introduction of the ggplot package (used for data visualization)
+Ggplot2 is a R package that allows to create graphics for any data from a dataframe. Ggplo2 allows much flexibility in graph creation as it allows to control how and which variables are plotted, and provides many different aesthetic functions, such as the choice of dot size, color, jittering and choice of either line or bars presentation. 
+
+For the Anova test, no package was needed.
+Here is my code explained step by step:
+
+```{r}
+#changing Country from a numercial variable to a a categorical variable.
+my_data$Country <- as.factor(my_data$Country)
+head(my_data)
+#Run the needed packages.
+library(ggplot2)
+#I first created on an excel sheet a summary of the percentage of death by age group for each country. I converted the excel file into a txt format-file and then imported it on R using the function red.delim. I then assigned my file to the variable "my_data".
+my_data <- read.delim(file.choose())
+
+#I used ggplot's aesthetic function to create an histogram with x-axis = age_range and y-axis = percentage_of_death. Each dot color on the graph represent a country, and I added the title "Percentage of death per age range" on the graph.
+p <- ggplot(my_data, aes(x=age_range, y=percentage_of_death, colour=Country)) +
+ #plots were bined along the Y axis and dots were stacked at the center.   
+    geom_dotplot(binaxis='y', stackdir='center') +
+    ggtitle("Percentage of death per age range")
+#The function stat_summary allow to display on my histogram the average (with red dot color) and standard deviation of the death rate between Australia, USA and Canada for each age group.
+p + stat_summary(fun.data="mean_sdl", fun.args = list(mult=1), 
+        geom="pointrange", color="red", width=0.2)
+#The aov function allow me to run an ANOVA one-way test on my data
+res.aov <- aov(percentage_of_death ~ age_range, data = my_data)
+#The function summary allows to display the result of the one-way ANOVA test.The column Pr(>F) corresponds to the P-value
+summary(res.aov)
+```
+Analysis of the results:
+
+Since the p-value is less than the significance level 0.05 (here, arund 1.76x10-9) we can conclude that there are significant differences in the mortality rate between the different age groups. 
+On my plot graph, the x-axis corresponds to the age range while the Y-axis corresponds to the percentage of death due to Sars-CoV-2 observed in each of these age groups in US, Canada and Australia. According to my plot graph, we can see that the mean of death rate starts to increase significantly in the 50-59 years old group. Thus, my hypothesis seems correct since percentage of death for older groups is significantly higher than the mean of death rate for younger groups.
